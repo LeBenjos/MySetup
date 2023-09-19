@@ -25,10 +25,37 @@ export default class TestModel{
     }
 
     setModel(){
-        const material = new THREE.MeshMatcapMaterial()
-        this.model = this.resource.scene
-        this.model.rotationSpeed = 0.0001
+        const material = new THREE.ShaderMaterial({
+            vertexShader: /* glsl */`
+            varying vec2 vUv;
 
+            void main(){
+                vec4 modelPosition = modelMatrix * vec4(position, 1.);
+                vec4 viewPosition = viewMatrix * modelPosition;
+                vec4 projectionPosition = projectionMatrix * viewPosition;
+
+                gl_Position = projectionPosition;
+                
+                vUv = uv;
+            }    
+            `,
+            fragmentShader: /* glsl */`
+            varying vec2 vUv;
+
+            void main(){
+                gl_FragColor = vec4(vUv, 1., 1.);
+            }
+            `
+        })
+
+        // const geometry = new THREE.BoxGeometry( 1, 1, 1 )        
+        // this.model = new THREE.Mesh(
+        //     geometry,
+        //     material
+        // )
+        
+        this.model = this.resource.scene
+        
         this.model.traverse((child) => {
             if(child.isMesh && child.material.isMaterial){
                 child.material = material
@@ -39,6 +66,8 @@ export default class TestModel{
                 child.castShadow = true
             }
         })
+
+        this.model.rotationSpeed = 0.0001
 
         this.scene.add(this.model)
 

@@ -23,6 +23,6 @@ export default [
     {
         name: 'logo',
         type: 'gltfModel',
-        path: 'models/Logo/Logo.gltf'
+        path: 'models/Logo/Logo.glb'
     }
 ]
